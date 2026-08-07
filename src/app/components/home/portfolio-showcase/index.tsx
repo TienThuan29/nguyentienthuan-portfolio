@@ -34,6 +34,7 @@ import {
   Sparkles,
   Trophy,
 } from "@/app/components/svg-icons";
+import type { ComponentType } from "react";
 import {
   awards,
   certificates,
@@ -86,6 +87,11 @@ const projectAccents = [
     marker: "bg-indigo-500",
   },
 ] as const;
+
+const highlightedProjectTitles = [
+  "EduACAS - Educational Automated Computerized Assessment System",
+  "Palm Print Identification System",
+];
 
 const openExternal = (href: string) => {
   const nextWindow = window.open(href, "_blank", "noopener,noreferrer");
@@ -298,6 +304,71 @@ const FeaturedCard = ({ item, index }: { item: FeaturedWorkItem; index: number }
   );
 };
 
+const ProjectGridCard = ({ item }: { item: FeaturedWorkItem }) => {
+  const primaryTags = item.tags.slice(0, 3);
+  const primaryLink = item.links[0];
+
+  return (
+    <Card
+      className="group flex h-full flex-col justify-between rounded-lg border border-white/10 bg-white/[0.04] p-5 backdrop-blur transition duration-300 hover:border-white/22 hover:bg-white/[0.07]"
+      variant="transparent"
+    >
+      <div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="rounded-md border border-white/14 bg-white/8 px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-white/68">
+            {item.kicker}
+          </span>
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-white/50">
+            <CalendarDays className="size-3.5" />
+            {item.period}
+          </span>
+        </div>
+        <h3 className="mt-4 text-lg font-semibold leading-snug text-white">{item.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-zinc-300">{item.description}</p>
+      </div>
+
+      <div className="mt-5">
+        <div className="flex flex-wrap gap-1.5">
+          {primaryTags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md border border-white/12 bg-white/6 px-2 py-1 text-xs font-medium text-white/78"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-4 border-t border-white/10 pt-4">
+          {primaryLink ? (
+            <HeroLink
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 group-hover:text-emerald-200"
+              href={primaryLink.href}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {primaryLink.label}
+              <ArrowUpRight className="size-4" />
+            </HeroLink>
+          ) : (
+            <span className="text-sm font-medium text-white/45">
+              Internal project details available on request
+            </span>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const roleIcons: { match: string; icon: ComponentType<{ className?: string }> }[] = [
+  { match: "Researcher", icon: FlaskConical },
+  { match: "Intern", icon: GraduationCap },
+  { match: "Developer", icon: Code2 },
+];
+
+const getRoleIcon = (role: string) =>
+  roleIcons.find((entry) => role.includes(entry.match))?.icon ?? BriefcaseBusiness;
+
 const TimelineItem = ({
   role,
   org,
@@ -306,43 +377,71 @@ const TimelineItem = ({
   summary,
   details,
   skills,
-}: (typeof experience)[number]) => (
-  <div className="relative grid gap-4 border-l border-zinc-950/10 pb-10 pl-6 last:pb-0">
-    <span className="absolute -left-[7px] top-1 size-3 rounded-full border-2 border-white bg-emerald-700 shadow-[0_0_0_3px_rgba(4,120,87,0.18)]" />
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <h3 className="text-xl font-semibold text-zinc-950">{role}</h3>
-        <p className="mt-1 text-sm font-medium text-zinc-600">{org}</p>
-      </div>
-      <Chip className="rounded-md" color="accent" size="sm" variant="soft">
-        <CalendarDays className="size-3.5" />
-        <Chip.Label>{period}</Chip.Label>
-      </Chip>
-    </div>
-    <p className="flex items-center gap-2 text-sm text-zinc-500">
-      <MapPin className="size-4" />
-      {location}
-    </p>
-    <p className="max-w-3xl text-sm leading-6 text-zinc-700">{summary}</p>
-    <ul className="grid gap-2">
-      {details.map((detail) => (
-        <li key={detail} className="flex gap-3 text-sm leading-6 text-zinc-700">
-          <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-700" />
-          <span>{detail}</span>
-        </li>
-      ))}
-    </ul>
-    <div className="flex flex-wrap gap-2">
-      {skills.map((skill) => (
-        <Chip key={skill} className="rounded-md" size="sm" variant="secondary">
-          <Chip.Label>{skill}</Chip.Label>
+}: (typeof experience)[number]) => {
+  const isCurrent = period.toLowerCase().includes("present");
+  const RoleIcon = getRoleIcon(role);
+
+  return (
+    <div className="relative grid gap-4 border-l border-zinc-950/10 pb-10 pl-6 last:pb-0">
+      <span
+        className={`absolute -left-[7px] top-1 size-3 rounded-full border-2 border-white shadow-[0_0_0_3px_rgba(4,120,87,0.18)] ${
+          isCurrent ? "bg-emerald-700" : "bg-zinc-400"
+        }`}
+      />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-emerald-900/10 text-emerald-800">
+            <RoleIcon className="size-4.5" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-xl font-semibold text-zinc-950">{role}</h3>
+              {isCurrent && (
+                <Chip className="rounded-md" color="success" size="sm" variant="soft">
+                  <Chip.Label>Current</Chip.Label>
+                </Chip>
+              )}
+            </div>
+            <p className="mt-1 text-sm font-medium text-zinc-600">{org}</p>
+          </div>
+        </div>
+        <Chip className="rounded-md" color="accent" size="sm" variant="soft">
+          <CalendarDays className="size-3.5" />
+          <Chip.Label>{period}</Chip.Label>
         </Chip>
-      ))}
+      </div>
+      <p className="flex items-center gap-2 text-sm text-zinc-500">
+        <MapPin className="size-4" />
+        {location}
+      </p>
+      <p className="max-w-3xl text-sm leading-6 text-zinc-700">{summary}</p>
+      <ul className="grid gap-2">
+        {details.map((detail) => (
+          <li key={detail} className="flex gap-3 text-sm leading-6 text-zinc-700">
+            <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-700" />
+            <span>{detail}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill) => (
+          <Chip key={skill} className="rounded-md" size="sm" variant="secondary">
+            <Chip.Label>{skill}</Chip.Label>
+          </Chip>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function PortfolioShowcase() {
+  const highlightedProjects = featuredWork.filter((item) =>
+    highlightedProjectTitles.includes(item.title)
+  );
+  const otherProjects = featuredWork.filter(
+    (item) => !highlightedProjectTitles.includes(item.title)
+  );
+
   return (
     <div id="top" className="min-h-screen overflow-hidden bg-[var(--background)] text-zinc-950">
       <section className="relative isolate border-b border-zinc-950/10">
@@ -533,7 +632,7 @@ export default function PortfolioShowcase() {
                 Project stories that show the interface, system layer, and measurable responsibility.
               </h2>
               <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:text-lg">
-                Each project now reads like a compact dossier: what it is, what I owned, which stack supported it, and where the proof lives.
+                The two most representative builds get the full dossier treatment; the rest are one scan away below.
               </p>
             </div>
             <div className="border-l border-white/14 pl-5">
@@ -552,10 +651,27 @@ export default function PortfolioShowcase() {
               </div>
             </div>
           </div>
+
           <div className="mt-12 grid gap-6">
-            {featuredWork.map((item, index) => (
+            {highlightedProjects.map((item, index) => (
               <FeaturedCard key={item.title} item={item} index={index} />
             ))}
+          </div>
+
+          <div className="mt-16">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-white/55">
+                More projects
+              </p>
+              <span className="text-sm text-white/45">
+                {otherProjects.length} additional {otherProjects.length === 1 ? "project" : "projects"}
+              </span>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {otherProjects.map((item) => (
+                <ProjectGridCard key={item.title} item={item} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
