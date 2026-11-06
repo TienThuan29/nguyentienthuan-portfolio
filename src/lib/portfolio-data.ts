@@ -1,42 +1,35 @@
+/** Prefix for raw `/public` paths (next/image and plain <a> don't add basePath themselves). */
+export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const portfolioLinks = {
   email: "mailto:nguyentienthuan9595@gmail.com",
-  cv: "/api/cv",
+  cv: `${basePath}/Nguyen_Tien_Thuan_CV.pdf`,
   github: "https://github.com/tienthuan29",
   linkedin: "https://www.linkedin.com/in/tien-thuan-nguyen-23112b3b7",
   facebook: "https://www.facebook.com/nguyen.tienthuan.35/",
   palmPrintRepository: "https://github.com/VKev/Palm-Print-Identification-System",
   diffusionIadRepository: "https://github.com/TienThuan29/Diffusion-IAD",
-  eduAcasRepository: "https://github.com/TienThuan29/Capstone-Sp26-EduACAS",
-  freelanceItRepository: "https://github.com/TienThuan29/FreelanceIT-App",
-  ticketResellFrontend: "https://github.com/Arexmarx/ResellTicket_PlatformUi",
-  ticketResellBackend: "https://github.com/TienThuan29/ticket-resell-platform-backend-v2",
-  jungleRunGame: "https://github.com/TienThuan29/JungleRunGame",
-} as const;
-
-export const linkLabels = {
-  github: "github.com/tienthuan29",
-  facebook: "facebook.com/nguyen.tienthuan.35",
 } as const;
 
 export const pageAnchors = {
   top: "#top",
   about: "#about",
-  work: "#work",
   experience: "#experience",
-  papers: "#accepted-papers",
-  credentials: "#credentials",
+  certifications: "#certifications",
+  research: "#research",
+  education: "#education",
+  contact: "#contact",
 } as const;
 
 export const profile = {
   name: "Nguyễn Tiến Thuận",
-  initials: "NT",
-  role: "Junior AI Engineer",
-  headline: "I build full-stack products around practical AI research.",
+  role: "AI Engineer",
+  currentOrg: "SoftwareOne Vietnam",
+  headline: "AI Engineer building agents, LLM apps, and the full-stack products around them.",
   summary:
-    "Graduating Software Engineering student at FPT University with strengths in web development, computer vision research, and turning models into usable software.",
-  location: "Vietnam",
+    "Today I build AI agents, chatbots, and AI-powered web applications for enterprise clients. Before that I led a university lab portal build, published two computer vision papers, and spent over a year as a teaching assistant, so I care as much about explaining a system clearly as about shipping it.",
+  location: "Ho Chi Minh City, Vietnam",
   email: "nguyentienthuan9595@gmail.com",
-  phone: "0365-5656-92",
   github: portfolioLinks.github,
   linkedin: portfolioLinks.linkedin,
   facebook: portfolioLinks.facebook,
@@ -44,262 +37,91 @@ export const profile = {
 
 export const navItems = [
   { label: "About", href: pageAnchors.about },
-  { label: "Work", href: pageAnchors.work },
   { label: "Experience", href: pageAnchors.experience },
-  { label: "Papers", href: pageAnchors.papers },
-  { label: "Credentials", href: pageAnchors.credentials },
+  { label: "Certifications", href: pageAnchors.certifications },
+  { label: "Research", href: pageAnchors.research },
+  { label: "Education", href: pageAnchors.education },
+  { label: "Contact", href: pageAnchors.contact },
+];
+
+export const heroFacts = [
+  { label: "Currently", value: "AI Engineer, SoftwareOne Vietnam" },
+  { label: "Previously", value: "Tech Lead, FPTU Laboratories" },
+  { label: "Research", value: "Computer vision | 2 international papers" },
+  { label: "Certified", value: "3× Microsoft | Azure AI & Agentic AI" },
 ];
 
 export const heroMetrics = [
-  {
-    value: "2",
-    label: "accepted AI papers",
-    detail: "SSPS 2025 and ICAISE 2026",
-  },
-  {
-    value: "3.55",
-    label: "GPA / 4.0",
-    detail: "Software Engineering at FPTU",
-  },
-  {
-    value: "2026",
-    label: "Azure AI training",
-    detail: "AI-102 and AB-900 courses",
-  },
-];
-
-export const focusCards = [
-  {
-    title: "Computer vision research",
-    description:
-      "Palm print recognition and image anomaly detection with PyTorch-driven experimentation.",
-  },
-  {
-    title: "Full-stack delivery",
-    description:
-      "From relational database design to production-facing interfaces with Next.js, React, Spring, and MySQL.",
-  },
-  {
-    title: "AI product integration",
-    description:
-      "Connecting research models, backend services, and user workflows into complete applications.",
-  },
+  { value: "02", label: "International papers", detail: "SSPS 2025 | ICAISE 2026" },
+  { value: "03", label: "Microsoft certifications", detail: "Including one Expert level" },
+  { value: "1 yr+", label: "University teaching", detail: "Python | C/C++ | DSA | Java OOP" },
 ];
 
 export const skills = [
+  { title: "AI", items: ["LLM", "Agentic AI", "Computer Vision", "PyTorch"] },
+  { title: "Languages", items: ["Python", "TypeScript", "Java", "C#", "C/C++", "HTML", "CSS"] },
   {
-    title: "Programming",
-    items: ["Java", "C#", "TypeScript", "Python", "HTML", "CSS", "GitHub"],
+    title: "Frameworks & tools",
+    items: ["Next.js", "React", "Spring Framework", "ASP.NET", "Docker", "Git/GitHub"],
   },
+  { title: "Data & cloud", items: ["Azure", "PostgreSQL", "MySQL", "SQL Server"] },
   {
-    title: "Frameworks",
-    items: [
-      "Spring Framework",
-      "ASP.NET",
-      ".NET 9",
-      "Node.js/Express",
-      "Next.js",
-      "React",
-      "NestJS",
-      "Flutter",
-      "PyTorch",
-    ],
-  },
-  {
-    title: "Database & cloud",
-    items: [
-      "MySQL",
-      "SQL Server",
-      "PostgreSQL",
-      "DynamoDB",
-      "Redis",
-      "RabbitMQ",
-      "AWS S3",
-      "Pinecone",
-      "AWS",
-      "Docker",
-    ],
-  },
-  {
-    title: "AI & research",
-    items: [
-      "Computer Vision",
-      "Diffusion Models",
-      "Image Anomaly Detection",
-      "AI-assisted grading",
-      "Semantic matching",
-    ],
-  },
-];
-
-export const featuredWork = [
-  {
-    title: "EduACAS - Educational Automated Computerized Assessment System",
-    kicker: "Capstone platform",
-    period: "Spring 2026",
-    description:
-      "A full-stack programming education platform for automated code assessment, exam and classroom management, analytics, real-time notifications, and mobile access.",
-    impact: [
-      "Built web and mobile learning surfaces for administrators, lecturers, and students.",
-      "Integrated programming problem banks, code editor workflows, submissions, quizzes, exams, regrading, and academic analytics.",
-      "Worked across a distributed architecture with Ocelot API Gateway, .NET 9 services, NestJS code runner, DynamoDB, Redis, RabbitMQ, SignalR, Firebase, Docker, and AWS.",
-    ],
-    tags: [
-      "Next.js",
-      ".NET 9",
-      "NestJS",
-      "Flutter",
-      "DynamoDB",
-      "Docker",
-      "SignalR",
-    ],
-    links: [
-      {
-        label: "Repository",
-        href: portfolioLinks.eduAcasRepository,
-      },
-    ],
-  },
-  {
-    title: "Laboratories Website of FPTU",
-    kicker: "Current product build",
-    period: "January 2026 - Present",
-    image: "/images/feature-work/feature-img-1.png",
-    description:
-      "A web portal for managing research projects, academic publications, and student recruitment for FPT University's laboratories.",
-    impact: [
-      "Analyzed requirements and planned the platform.",
-      "Architected a MySQL relational database and Docker-based infrastructure.",
-      "Engineered end-to-end features from backend logic to user interfaces.",
-    ],
-    tags: ["Next.js", "MySQL", "Docker", "Full-stack"],
-    links: [],
-  },
-  {
-    title: "FreelanceIT",
-    kicker: "AI freelance marketplace",
-    period: "November 2025",
-    description:
-      "A full-stack freelancing platform that connects customers and developers through project posting, AI-assisted matching, real-time collaboration, subscriptions, and payments.",
-    impact: [
-      "Built role-based customer, developer, and admin workflows for profiles, project posts, applications, ratings, products, and platform statistics.",
-      "Implemented project rooms with Socket.IO chat, team management, file sharing, timeline tracking, NDA flows, and transaction history.",
-      "Integrated Gemini embeddings, Pinecone vector search, DynamoDB, S3, Redis, Google OAuth, PayOS, Casso, Swagger, Docker Compose, and Nginx deployment.",
-    ],
-    tags: [
-      "Next.js",
-      "Express",
-      "TypeScript",
-      "DynamoDB",
-      "Socket.IO",
-      "Pinecone",
-      "PayOS",
-    ],
-    links: [
-      {
-        label: "Repository",
-        href: portfolioLinks.freelanceItRepository,
-      },
-    ],
-  },
-  {
-    title: "Palm Print Identification System",
-    kicker: "Accepted AI research",
-    period: "Accepted January 2025",
-    image: "/images/feature-work/feature-img-2.png",
-    description:
-      "A contactless palm print recognition system tailored for university identity verification and access control.",
-    impact: [
-      "Developed and trained the core model with real-world data.",
-      "Built software for model integration in a university environment.",
-      "Paper accepted at SSPS 2025.",
-    ],
-    tags: ["PyTorch", "Spring Framework", "Next.js", "Computer Vision"],
-    links: [
-      {
-        label: "Repository",
-        href: portfolioLinks.palmPrintRepository,
-      },
-    ],
-  },
-  {
-    title: "Diffusion-IAD",
-    kicker: "Industrial AI experiment",
-    period: "Accepted March 2026",
-    description:
-      "Proof-of-concept AI solution for industrial image anomaly detection using feature-level diffusion modeling.",
-    impact: [
-      "Researched feature-level diffusion for anomaly detection.",
-      "Built a PyTorch proof of concept for industrial imagery.",
-      "Paper accepted at ICAISE 2026.",
-    ],
-    tags: ["PyTorch", "Diffusion", "Anomaly Detection"],
-    links: [
-      {
-        label: "Repository",
-        href: portfolioLinks.diffusionIadRepository,
-      },
-    ],
-  },
-  {
-    title: "Ticket Resell Platform",
-    kicker: "Full-stack project",
-    period: "August 2024 - December 2024",
-    description:
-      "Third-party marketplace connecting ticket buyers and sellers with safer, more transparent transactions.",
-    impact: [
-      "Analyzed context and requirements.",
-      "Designed database and platform architecture.",
-      "Developed frontend and backend features.",
-    ],
-    tags: ["Spring Framework", "React", "SQL Server"],
-    links: [
-      {
-        label: "Frontend",
-        href: portfolioLinks.ticketResellFrontend,
-      },
-      {
-        label: "Backend",
-        href: portfolioLinks.ticketResellBackend,
-      },
-    ],
+    title: "Communication",
+    items: ["Client demos", "Workshops & training", "Lab instruction", "Mentoring"],
   },
 ];
 
 export const experience = [
   {
-    role: "Student Researcher",
-    org: "University Laboratory",
-    period: "April 2024 - Present",
-    location: "FPT University",
-    summary:
-      "Researching practical computer vision systems and translating accepted paper work into software prototypes.",
+    role: "AI Engineer",
+    org: "SoftwareOne Vietnam",
+    period: "May 2026 — Present",
+    current: true,
+    summary: "Enterprise AI agents, chatbots, and AI-integrated web applications.",
     details: [
-      "Accepted AI research papers in palm print recognition and image anomaly detection.",
-      "Developed models, software integrations, and proof-of-concept AI workflows.",
+      "Build AI agents and chatbots for enterprise clients using Python.",
+      "Develop full-stack web applications that integrate AI features.",
+      "Prepare proofs of concept and demos, and present technical solutions to clients in clear, non-technical language.",
+      "Run training sessions and workshops to help colleagues and clients get started with new AI technologies.",
     ],
-    skills: ["PyTorch", "Computer Vision", "Next.js", "Spring Framework"],
+    skills: ["Python", "LLM", "Agentic AI", "Azure", "Full-stack"],
   },
   {
-    role: "Full-stack Developer",
-    org: "Laboratories Website of FPTU Project",
-    period: "January 2026 - Present",
-    location: "Vietnam",
+    role: "Tech Lead & Fullstack Developer",
+    org: "FPTU Laboratories",
+    period: "Jan 2026 — Apr 2026",
+    current: false,
     summary:
-      "Building an academic laboratory portal for project management, publication tracking, and student recruitment.",
+      "Web portal for managing research projects, publications, and student recruitment.",
     details: [
-      "Built a research management portal for projects, publications, and recruitment.",
-      "Designed MySQL database architecture and containerized infrastructure with Docker.",
+      "Led development of the portal with Next.js, MySQL, and Docker.",
+      "Planned the development roadmap, breaking the project into clear tasks and milestones.",
+      "Managed the project end to end, tracking progress and delivering on schedule.",
+      "Coordinated the team to align goals, assign tasks, and resolve blockers.",
     ],
-    skills: ["Next.js", "MySQL", "Docker", "Full-stack Architecture"],
+    skills: ["Next.js", "MySQL", "Docker", "Team lead"],
+  },
+  {
+    role: "Teaching Assistant",
+    org: "FPT University",
+    period: "Jan 2025 — Apr 2026",
+    current: false,
+    summary:
+      "Courses: Introduction to Programming (Python, C/C++), Data Structures & Algorithms, OOP with Java, Introduction to Computer Science.",
+    details: [
+      "Led lab sessions, walking students through exercises and re-explaining key concepts in simpler terms.",
+      "Gave one-on-one support in Q&A hours, helping students who had fallen behind rebuild their foundations.",
+      "Graded assignments and tests with specific, constructive feedback.",
+      "Designed practice exercises, examples, and materials to make abstract topics easier to understand.",
+    ],
+    skills: ["Python", "C/C++", "Java", "DSA"],
   },
   {
     role: "Salesforce Developer Intern",
-    org: "FPT Software Company",
-    period: "January 2025 - April 2025",
-    location: "Vietnam",
-    summary:
-      "Joined enterprise Salesforce training and requirements work for a B2B project environment.",
+    org: "FPT Software",
+    period: "Jan 2025 — Apr 2025",
+    current: false,
+    summary: "Enterprise Salesforce training and requirements work in a B2B project environment.",
     details: [
       "Joined the requirements phase of a B2B Salesforce project.",
       "Completed Salesforce development training covering LWC, Apex, and SOQL.",
@@ -311,98 +133,74 @@ export const experience = [
 export const researchPapers = [
   {
     title:
-      "Enhance an Efficient Contactless Palm Print Recognition System Tailored for University Environment",
-    conference:
-      "2025 7th International Symposium on Signal Processing Systems (SSPS 2025)",
-    accepted: "24 January 2025",
-    authors:
-      "Huynh Vuong Khang, Nguyen Tien Thuan, Dr. Huynh Cong Viet Ngu",
-    description:
-      "Palm print recognition for student identity verification, access control, and prevention of unauthorized entry.",
+      "Enhancing an Efficient Contactless Palm Print Recognition System Tailored for University Environment",
+    authors: ["Huynh Vuong Khang", "Nguyen Tien Thuan", "Huynh Cong Viet Ngu"],
+    venue: "7th International Symposium on Signal Processing Systems (SSPS 2025)",
+    status: "Published | Springer Nature",
+    year: "2025",
     contributions: [
-      "Developed and trained the core recognition model with real-world data.",
-      "Built software integration around the model for university identity verification workflows.",
-      "Worked with authors on system design, evaluation, and paper preparation.",
+      "Developed and trained the core recognition model on real-world data.",
+      "Built the software that integrates the model into university identity verification.",
     ],
-    role: "Author and model/application developer",
     tags: ["PyTorch", "Spring Framework", "Next.js"],
     href: portfolioLinks.palmPrintRepository,
   },
   {
-    title:
-      "Feature-Level Diffusion Convolutional Networks for Image Anomaly Detection",
-    conference: "International Conference on AI in Systems Engineering (ICAISE'2026)",
-    accepted: "24 March 2026",
-    authors: "Nguyen Tien Thuan, Dr. Huynh Cong Viet Ngu",
-    description:
-      "Feature-level diffusion model research for industrial image anomaly detection.",
+    title: "Feature-Level Diffusion Convolutional Networks for Image Anomaly Detection",
+    authors: ["Nguyen Tien Thuan", "Huynh Cong Viet Ngu"],
+    venue: "International Conference on AI in Systems Engineering (ICAISE 2026)",
+    status: "Accepted",
+    year: "2026",
     contributions: [
       "Researched feature-level diffusion modeling for industrial anomaly detection.",
-      "Implemented a PyTorch proof of concept for visual anomaly detection experiments.",
-      "Prepared research material with the corresponding author for ICAISE 2026.",
+      "Implemented the PyTorch proof of concept and experiments.",
     ],
-    role: "Author and AI research developer",
-    tags: ["PyTorch", "Computer Vision", "Diffusion"],
+    tags: ["PyTorch", "Diffusion", "Anomaly Detection"],
     href: portfolioLinks.diffusionIadRepository,
   },
 ];
 
+/** Author name as it appears in `researchPapers[].authors`, highlighted in citations. */
+export const selfAuthorName = "Nguyen Tien Thuan";
+
 export const education = [
   {
-    school: "FPT University (FPTU)",
-    degree: "Bachelor of Software Engineering",
-    period: "September 2022 - Present",
-    details: [
-      "GPA: 3.55/4.0",
-      "Relevant coursework: C Programming, OOP with Java, Database Management, Algorithms and Data Structures, Software Requirements, Software Architecture.",
-    ],
+    school: "FPT University",
+    degree: "Bachelor of Information Technology",
+    period: "Sep 2022 — Apr 2026",
+    details: ["GPA: 3.4/4.0"],
   },
 ];
 
-export const certificates = [
-  {
-    title: "Develop AI solutions in Azure",
-    period: "April 2026 - May 2026",
-    details: [
-      "Completed Course AI-102T00-A.",
-      "Covered generative AI apps, AI agents, natural language, computer vision, and information extraction on Azure.",
-    ],
-  },
-  {
-    title: "Introduction to Microsoft 365 and AI administration",
-    period: "April 2026 - May 2026",
-    details: [
-      "Completed Course AB-900T00-A.",
-      "Covered Microsoft 365 administration, Copilot, and agent administration.",
-    ],
-  },
+type Certificate = {
+  code: string;
+  title: string;
+  level: "Expert" | "Associate";
+  /** PDF + WebP preview live in public/certs/<code>.{pdf,webp}. */
+  pdf: string;
+  image: string;
+  /** Microsoft Learn share link (learn.microsoft.com/api/credentials/share/...). Shown as "Verify" when set. */
+  verifyUrl?: string;
+};
+
+const cert = (code: string, title: string, level: Certificate["level"]): Certificate => ({
+  code,
+  title,
+  level,
+  pdf: `${basePath}/certs/${code}.pdf`,
+  image: `${basePath}/certs/${code}.webp`,
+});
+
+export const certificates: Certificate[] = [
+  cert("AB-100", "Agentic AI Business Solutions Architect", "Expert"),
+  cert("AI-103", "Azure AI Apps and Agents Developer", "Associate"),
+  cert("AI-200", "Azure AI Cloud Developer", "Associate"),
 ];
 
 export const awards = [
   {
     title: "Golden Toad Award",
     period: "April 2024",
-    details: [
-      "Recognized as the most outstanding student of the semester.",
-      "Semester GPA: 3.9/4 at FPT University, Ho Chi Minh City.",
-    ],
-  },
-  {
-    title: "University Scholarship",
-    period: "September 2022",
-    details: [
-      "Received FPT University entrance scholarship for four years of undergraduate study.",
-    ],
-  },
-];
-
-export const sideProjects = [
-  {
-    title: "Jungle Run Game",
-    period: "March 2023 - April 2023",
-    description:
-      "2D obstacle course game built with C and SDL, including collision detection, game states, and input handling.",
-    tags: ["C", "SDL"],
-    href: portfolioLinks.jungleRunGame,
+    detail: "Most outstanding student of the semester, FPT University.",
   },
 ];

@@ -1,1022 +1,474 @@
-"use client";
-
 import Image from "next/image";
-import {
-  Avatar,
-  Button,
-  Card,
-  Chip,
-  Link as HeroLink,
-  Separator,
-  Tabs,
-} from "@heroui/react";
+import type { ComponentType, ReactNode } from "react";
+import OutlineNav from "./outline-nav";
 import {
   ArrowUpRight,
-  Award,
-  BadgeCheck,
-  BookOpen,
-  BriefcaseBusiness,
-  CalendarDays,
-  Code2,
-  Database,
+  Bot,
+  BrainCircuit,
   Download,
-  ExternalLink,
-  Facebook,
-  FlaskConical,
-  Github,
-  GraduationCap,
+  GitHubBrandIcon,
   Layers3,
-  Linkedin,
-  Mail,
-  MapPin,
-  Medal,
-  Phone,
-  Sparkles,
-  Trophy,
+  LinkedInBrandIcon,
+  MicrosoftBrandIcon,
+  Network,
+  ReadCvBrandIcon,
+  UsersRound,
 } from "@/app/components/svg-icons";
-import type { ComponentType } from "react";
 import {
   awards,
+  basePath,
   certificates,
   education,
   experience,
-  featuredWork,
-  focusCards,
+  heroFacts,
   heroMetrics,
-  linkLabels,
+  pageAnchors,
   portfolioLinks,
   profile,
   researchPapers,
-  sideProjects,
+  selfAuthorName,
   skills,
 } from "@/lib/portfolio-data";
 
-type FeaturedWorkItem = (typeof featuredWork)[number];
+const anchorId = (href: string) => href.slice(1);
 
-const projectAccents = [
-  {
-    code: "Build",
-    surface: "bg-[#0d2d27]",
-    glow: "from-emerald-300/24 via-transparent to-amber-300/18",
-    chip: "border-emerald-300/45 bg-emerald-100 text-emerald-950",
-    text: "text-emerald-800",
-    marker: "bg-emerald-500",
-  },
-  {
-    code: "Lab",
-    surface: "bg-[#10233a]",
-    glow: "from-sky-300/22 via-transparent to-emerald-300/14",
-    chip: "border-sky-300/45 bg-sky-100 text-sky-950",
-    text: "text-sky-800",
-    marker: "bg-sky-500",
-  },
-  {
-    code: "AI",
-    surface: "bg-[#2f2615]",
-    glow: "from-amber-300/24 via-transparent to-emerald-300/16",
-    chip: "border-amber-300/55 bg-amber-100 text-amber-950",
-    text: "text-amber-800",
-    marker: "bg-amber-500",
-  },
-  {
-    code: "Research",
-    surface: "bg-[#25243a]",
-    glow: "from-indigo-300/20 via-transparent to-emerald-300/14",
-    chip: "border-indigo-300/45 bg-indigo-100 text-indigo-950",
-    text: "text-indigo-800",
-    marker: "bg-indigo-500",
-  },
-] as const;
-
-const highlightedProjectTitles = [
-  "EduACAS - Educational Automated Computerized Assessment System",
-  "Palm Print Identification System",
-];
-
-const openExternal = (href: string) => {
-  const nextWindow = window.open(href, "_blank", "noopener,noreferrer");
-  if (nextWindow) nextWindow.opener = null;
-};
-
-const SectionHeading = ({
-  kicker,
-  title,
-  description,
-}: {
-  kicker: string;
-  title: string;
-  description: string;
-}) => (
-  <div className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10">
-    <p className="section-kicker">{kicker}</p>
-    <div className="max-w-3xl">
-      <h2 className="text-3xl font-semibold leading-tight tracking-normal text-zinc-950 sm:text-4xl">
-        {title}
-      </h2>
-      <p className="mt-4 text-base leading-7 text-zinc-600 sm:text-lg">
-        {description}
-      </p>
-    </div>
-  </div>
-);
-
-const ContactButton = () => (
-  <Button
-    className="rounded-md bg-zinc-950 px-5 text-white hover:bg-zinc-800"
-    size="lg"
-    onPress={() => {
-      window.location.href = portfolioLinks.email;
-    }}
+const ExternalLink = ({ href, icon, children }: { href: string; icon?: ReactNode; children: ReactNode }) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="label ink-link inline-flex items-center gap-1 pb-0.5 text-foreground hover:text-accent"
   >
-    <Mail className="size-4" />
-    Contact me
-  </Button>
+    {icon && <span className="mr-1 inline-flex">{icon}</span>}
+    {children}
+    <ArrowUpRight className="size-3.5" aria-hidden />
+  </a>
 );
 
-const FeaturedCard = ({ item, index }: { item: FeaturedWorkItem; index: number }) => {
-  const hasImage = "image" in item && item.image;
-  const accent = projectAccents[index % projectAccents.length];
-  const projectNumber = String(index + 1).padStart(2, "0");
-  const primaryTags = item.tags.slice(0, 4);
-
-  return (
-    <Card
-      className="group overflow-hidden rounded-lg border border-white/12 bg-[#f9fbf6] p-0 text-zinc-950 shadow-[0_28px_90px_rgba(0,0,0,0.22)] lg:grid lg:grid-cols-[minmax(300px,0.8fr)_minmax(0,1.2fr)]"
-      variant="default"
-    >
-      <div className={`relative min-h-[320px] overflow-hidden ${accent.surface} lg:min-h-full`}>
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:34px_34px] opacity-40"
-        />
-        <div
-          aria-hidden
-          className={`absolute inset-0 bg-[linear-gradient(135deg,var(--tw-gradient-stops))] ${accent.glow}`}
-        />
-        {hasImage && (
-          <Image
-            src={item.image}
-            alt={`${item.title} preview`}
-            fill
-            sizes="(min-width: 1024px) 34vw, 100vw"
-            className="object-cover opacity-[0.82] mix-blend-luminosity transition duration-700 group-hover:scale-[1.035]"
-          />
-        )}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,9,8,0.08)_0%,rgba(5,9,8,0.62)_100%)]" />
-        <div className="relative z-10 flex min-h-[320px] flex-col justify-between p-5 text-white sm:p-6 lg:min-h-full">
-          <div className="flex items-center justify-between gap-3">
-            <span className="rounded-md border border-white/18 bg-white/12 px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur">
-              Project {projectNumber}
-            </span>
-            <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/78">
-              {accent.code}
-            </span>
-          </div>
-
-          {!hasImage && (
-            <div className="my-8 grid gap-3">
-              <div className="h-px w-full bg-white/22" />
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                <div className="h-20 rounded-md border border-white/18 bg-white/10 p-3 backdrop-blur">
-                  <Code2 className="size-5 text-white/85" />
-                  <p className="mt-5 font-mono text-xs uppercase tracking-[0.16em] text-white/65">
-                    Interface
-                  </p>
-                </div>
-                <div className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-white/14">
-                  <Layers3 className="size-5" />
-                </div>
-                <div className="h-20 rounded-md border border-white/18 bg-white/10 p-3 backdrop-blur">
-                  <Database className="size-5 text-white/85" />
-                  <p className="mt-5 font-mono text-xs uppercase tracking-[0.16em] text-white/65">
-                    Data
-                  </p>
-                </div>
-              </div>
-              <div className="h-px w-full bg-white/22" />
-            </div>
-          )}
-
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-white/64">
-              Core stack
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {primaryTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-md border border-white/16 bg-white/12 px-2.5 py-1 text-xs font-semibold text-white/86 backdrop-blur"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
+/* Every section opens like a journal article: heavy rule, section mark in the margin. */
+const Section = ({
+  href,
+  index,
+  label,
+  title,
+  children,
+}: {
+  href: string;
+  index: string;
+  label: string;
+  title: ReactNode;
+  children: ReactNode;
+}) => (
+  <section id={anchorId(href)} className="section-band" aria-labelledby={`${anchorId(href)}-title`}>
+    <div className="site-container">
+      <div className="grid gap-6 border-t-2 border-foreground pt-5 md:grid-cols-[10rem_minmax(0,1fr)] md:gap-12">
+        <p className="flex items-baseline gap-3 md:flex-col md:gap-1.5">
+          <span className="font-mono text-sm text-accent">§ {index}</span>
+          <span className="label">{label}</span>
+        </p>
+        <div className="min-w-0">
+          <h2
+            id={`${anchorId(href)}-title`}
+            className="max-w-3xl text-balance font-serif text-3xl leading-tight tracking-[-0.01em] sm:text-[2.75rem]"
+          >
+            {title}
+          </h2>
+          <div className="mt-10">{children}</div>
         </div>
       </div>
+    </div>
+  </section>
+);
 
-      <div className="flex min-h-full flex-col">
-        <Card.Header className="gap-4 p-6 pb-0 sm:p-7 sm:pb-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`inline-flex items-center gap-2 rounded-md border px-3 py-1 text-xs font-bold ${accent.chip}`}
-            >
-              <span className={`size-1.5 rounded-full ${accent.marker}`} />
-              {item.kicker}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-950/10 bg-white px-3 py-1 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-              <CalendarDays className="size-3.5" />
-              {item.period}
-            </span>
+/* Tag label → logo in public/icons/tech/ (Dashboard Icons; spring.svg via its Simple Icons set).
+   Concept tags have no brand logo, so they get a monochrome lucide glyph (conceptIcons) in the label's ink instead. */
+const tagIcons: Record<string, string> = {
+  Python: "python",
+  Azure: "azure",
+  "Next.js": "nextjs",
+  MySQL: "mysql",
+  Docker: "docker",
+  "C/C++": "cpp",
+  Java: "java",
+  PyTorch: "pytorch",
+  "Spring Framework": "spring",
+  Salesforce: "salesforce",
+  "Lightning Web Components": "salesforce",
+  Apex: "salesforce",
+  SOQL: "salesforce",
+};
+
+const conceptIcons: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
+  LLM: BrainCircuit,
+  "Agentic AI": Bot,
+  "Full-stack": Layers3,
+  "Team lead": UsersRound,
+  DSA: Network,
+};
+
+const Tags = ({ items }: { items: readonly string[] }) => (
+  <ul className="flex flex-wrap gap-x-4 gap-y-2">
+    {items.map((item) => {
+      const Concept = conceptIcons[item];
+      return (
+        <li key={item} className="label inline-flex items-center gap-1.5">
+          {tagIcons[item] ? (
+            <Image
+              src={`${basePath}/icons/tech/${tagIcons[item]}.svg`}
+              alt=""
+              width={14}
+              height={14}
+              className="size-3.5"
+            />
+          ) : (
+            Concept && <Concept className="size-3.5" aria-hidden />
+          )}
+          {item}
+        </li>
+      );
+    })}
+  </ul>
+);
+
+const Hero = () => {
+  const splitAt = profile.name.lastIndexOf(" ");
+  const fadeDelay = (ms: number) => ({ animationDelay: `${ms}ms` });
+
+  return (
+    <section id={anchorId(pageAnchors.top)} className="relative isolate">
+      {/* Full-bleed ink-wash backdrop behind the masthead; native 4:1 ratio, fades out before the headline. */}
+      <Image
+        src={`${basePath}/images/hero-sec/banner-bg-img.webp`}
+        alt=""
+        aria-hidden
+        width={1080}
+        height={267}
+        priority
+        sizes="100vw"
+        className="ink-fade-down pointer-events-none absolute inset-x-0 top-0 -z-10 h-auto w-full select-none opacity-60"
+      />
+      <div className="site-container pb-8 pt-10 sm:pt-16">
+        <div className="label flex flex-wrap justify-between gap-2 border-b border-border pb-3 animate-fade-up">
+          <span>Portfolio | {new Date().getFullYear()} edition</span>
+          <span>{profile.location}</span>
+        </div>
+  
+        <div
+          className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between animate-fade-up"
+          style={fadeDelay(80)}
+        >
+          <h1 className="font-serif text-[clamp(3.25rem,11.5vw,9.5rem)] font-normal leading-[0.9] tracking-[-0.035em]">
+            {profile.name.slice(0, splitAt)}{" "}
+            <em className="text-accent">{profile.name.slice(splitAt + 1)}</em>
+          </h1>
+          {/* Portrait cropped to 4:5 and offset so the frame sits behind it — the one "overlap" in the layout. */}
+          <div className="relative order-first w-32 shrink-0 sm:w-40 md:order-none md:w-52 lg:w-60">
+            <div className="absolute inset-0 -translate-x-2.5 translate-y-2.5 border border-accent" aria-hidden />
+            <Image
+              src={`${basePath}/images/hero-sec/user-img.png`}
+              alt={`Portrait of ${profile.name}`}
+              width={900}
+              height={900}
+              priority
+              sizes="(min-width: 1024px) 240px, (min-width: 768px) 208px, 160px"
+              className="relative aspect-[4/5] w-full object-cover object-[50%_12%]"
+            />
           </div>
-          <Card.Title className="max-w-3xl text-2xl font-semibold leading-tight text-zinc-950 sm:text-[1.7rem]">
-            {item.title}
-          </Card.Title>
-          <Card.Description className="max-w-3xl text-base leading-7 text-zinc-600">
-            {item.description}
-          </Card.Description>
-        </Card.Header>
-
-        <Card.Content className="grid gap-6 p-6 sm:p-7">
-          <div className="grid gap-4 md:grid-cols-[132px_minmax(0,1fr)]">
-            <p className={`font-mono text-xs font-bold uppercase tracking-[0.18em] ${accent.text}`}>
-              Impact
-            </p>
-            <ul className="grid gap-3">
-              {item.impact.map((point) => (
-                <li
-                  key={point}
-                  className="grid grid-cols-[20px_minmax(0,1fr)] gap-3 text-sm leading-6 text-zinc-700"
+        </div>
+  
+        <div
+          className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] md:gap-16 animate-fade-up"
+          style={fadeDelay(180)}
+        >
+          <div>
+            <p className="max-w-xl font-serif text-2xl leading-snug sm:text-[1.75rem]">{profile.headline}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <a
+                href={portfolioLinks.cv}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-foreground px-5 py-3 text-sm font-medium text-background transition-colors hover:bg-accent"
+              >
+                <Download className="size-4" aria-hidden />
+                Download CV
+              </a>
+              {[
+                { label: "GitHub", href: profile.github, Icon: GitHubBrandIcon },
+                { label: "LinkedIn", href: profile.linkedin, Icon: LinkedInBrandIcon },
+              ].map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border border-foreground px-4 py-3 text-sm font-medium transition-colors hover:border-accent hover:text-accent"
                 >
-                  <BadgeCheck className={`mt-1 size-4 ${accent.text}`} />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="grid gap-4 border-y border-zinc-950/10 py-5 md:grid-cols-[132px_minmax(0,1fr)]">
-            <p className={`font-mono text-xs font-bold uppercase tracking-[0.18em] ${accent.text}`}>
-              Stack
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {item.tags.map((tag) => (
-                <Chip
-                  key={tag}
-                  className="rounded-md border border-zinc-950/10 bg-white"
-                  size="sm"
-                  variant="secondary"
-                >
-                  <Chip.Label>{tag}</Chip.Label>
-                </Chip>
+                  <Icon className="size-4" aria-hidden />
+                  {label}
+                </a>
               ))}
             </div>
+            <a
+              href={portfolioLinks.email}
+              className="ink-link mt-5 inline-block pb-0.5 text-sm font-medium hover:text-accent"
+            >
+              {profile.email}
+            </a>
           </div>
-        </Card.Content>
+  
+          <dl className="text-sm">
+            {heroFacts.map((fact) => (
+              <div key={fact.label} className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-4 border-t border-border py-3">
+                <dt className="label pt-0.5">{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+  
+        <dl
+          className="mt-16 grid border-y border-border sm:grid-cols-3 animate-fade-up"
+          style={fadeDelay(280)}
+        >
+          {heroMetrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="flex flex-col gap-1 border-border py-6 sm:px-6 sm:first:pl-0 [&:not(:first-child)]:border-t sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:border-t-0"
+            >
+              <dt className="mt-3 text-sm font-medium">{metric.label}</dt>
+              <dd className="order-first font-serif text-5xl leading-none tracking-tight">{metric.value}</dd>
+              <dd className="label">{metric.detail}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+};
 
-        <Card.Footer className="mt-auto flex flex-wrap items-center justify-between gap-4 border-t border-zinc-950/10 bg-white/66 p-6 sm:p-7">
-          <span className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-            Case note / {projectNumber}
-          </span>
-          <div className="flex flex-wrap gap-3">
-            {item.links.length ? (
-              item.links.map((link) => (
-                <HeroLink
-                  key={link.href}
-                  className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text} hover:text-zinc-950`}
-                  href={link.href}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {link.label}
-                  <ArrowUpRight className="size-4" />
-                </HeroLink>
-              ))
-            ) : (
-              <span className="text-sm font-medium text-zinc-500">
-                Internal project details available on request
+const About = () => (
+  <Section href={pageAnchors.about} index="01" label="About" title="Engineer first, explainer by training.">
+    <p className="drop-cap max-w-2xl text-lg leading-8">{profile.summary}</p>
+
+    <h3 className="label mt-16">Toolkit</h3>
+    <dl className="mt-4 border-b border-border">
+      {skills.map((group) => (
+        <div key={group.title} className="grid gap-1 border-t border-border py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+          <dt className="label pt-0.5">{group.title}</dt>
+          <dd className="text-[15px]">
+            {group.items.map((item, i) => (
+              <span key={item}>
+                {i > 0 && <span className="text-muted-foreground">{" / "}</span>}
+                {item}
+              </span>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </Section>
+);
+
+const Experience = () => (
+  <Section href={pageAnchors.experience} index="02" label="Experience" title="Where I've built, led, and taught.">
+    <ol>
+      {experience.map((job) => (
+        <li
+          key={`${job.org}-${job.role}`}
+          className="grid gap-3 border-t border-border py-8 first:border-t-0 first:pt-0 md:grid-cols-[10rem_minmax(0,1fr)] md:gap-8"
+        >
+          <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-2">
+            <span className="font-mono text-xs text-muted-foreground">{job.period}</span>
+            {job.current && (
+              <span className="label inline-flex items-center gap-1.5 text-accent">
+                <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+                Now
               </span>
             )}
           </div>
-        </Card.Footer>
-      </div>
-    </Card>
-  );
-};
-
-const ProjectGridCard = ({ item }: { item: FeaturedWorkItem }) => {
-  const primaryTags = item.tags.slice(0, 3);
-  const primaryLink = item.links[0];
-
-  return (
-    <Card
-      className="group flex h-full flex-col justify-between rounded-lg border border-white/10 bg-white/[0.04] p-5 backdrop-blur transition duration-300 hover:border-white/22 hover:bg-white/[0.07]"
-      variant="transparent"
-    >
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="rounded-md border border-white/14 bg-white/8 px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-white/68">
-            {item.kicker}
-          </span>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-white/50">
-            <CalendarDays className="size-3.5" />
-            {item.period}
-          </span>
-        </div>
-        <h3 className="mt-4 text-lg font-semibold leading-snug text-white">{item.title}</h3>
-        <p className="mt-2 text-sm leading-6 text-zinc-300">{item.description}</p>
-      </div>
-
-      <div className="mt-5">
-        <div className="flex flex-wrap gap-1.5">
-          {primaryTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-md border border-white/12 bg-white/6 px-2 py-1 text-xs font-medium text-white/78"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-4 border-t border-white/10 pt-4">
-          {primaryLink ? (
-            <HeroLink
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 group-hover:text-emerald-200"
-              href={primaryLink.href}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              {primaryLink.label}
-              <ArrowUpRight className="size-4" />
-            </HeroLink>
-          ) : (
-            <span className="text-sm font-medium text-white/45">
-              Internal project details available on request
-            </span>
-          )}
-        </div>
-      </div>
-    </Card>
-  );
-};
-
-const roleIcons: { match: string; icon: ComponentType<{ className?: string }> }[] = [
-  { match: "Researcher", icon: FlaskConical },
-  { match: "Intern", icon: GraduationCap },
-  { match: "Developer", icon: Code2 },
-];
-
-const getRoleIcon = (role: string) =>
-  roleIcons.find((entry) => role.includes(entry.match))?.icon ?? BriefcaseBusiness;
-
-const TimelineItem = ({
-  role,
-  org,
-  period,
-  location,
-  summary,
-  details,
-  skills,
-}: (typeof experience)[number]) => {
-  const isCurrent = period.toLowerCase().includes("present");
-  const RoleIcon = getRoleIcon(role);
-
-  return (
-    <div className="relative grid gap-4 border-l border-zinc-950/10 pb-10 pl-6 last:pb-0">
-      <span
-        className={`absolute -left-[7px] top-1 size-3 rounded-full border-2 border-white shadow-[0_0_0_3px_rgba(4,120,87,0.18)] ${
-          isCurrent ? "bg-emerald-700" : "bg-zinc-400"
-        }`}
-      />
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-emerald-900/10 text-emerald-800">
-            <RoleIcon className="size-4.5" />
-          </div>
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-xl font-semibold text-zinc-950">{role}</h3>
-              {isCurrent && (
-                <Chip className="rounded-md" color="success" size="sm" variant="soft">
-                  <Chip.Label>Current</Chip.Label>
-                </Chip>
-              )}
+            <h3 className="font-serif text-2xl leading-tight">
+              {job.role} <span className="text-muted-foreground">— {job.org}</span>
+            </h3>
+            <p className="mt-2 font-serif text-lg italic text-muted-foreground">{job.summary}</p>
+            <ul className="mt-4 space-y-2 text-[15px] leading-7">
+              {job.details.map((detail) => (
+                <li key={detail} className="grid grid-cols-[1.25rem_minmax(0,1fr)]">
+                  <span className="text-accent" aria-hidden>
+                    –
+                  </span>
+                  {detail}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5">
+              <Tags items={job.skills} />
             </div>
-            <p className="mt-1 text-sm font-medium text-zinc-600">{org}</p>
           </div>
-        </div>
-        <Chip className="rounded-md" color="accent" size="sm" variant="soft">
-          <CalendarDays className="size-3.5" />
-          <Chip.Label>{period}</Chip.Label>
-        </Chip>
-      </div>
-      <p className="flex items-center gap-2 text-sm text-zinc-500">
-        <MapPin className="size-4" />
-        {location}
-      </p>
-      <p className="max-w-3xl text-sm leading-6 text-zinc-700">{summary}</p>
-      <ul className="grid gap-2">
-        {details.map((detail) => (
-          <li key={detail} className="flex gap-3 text-sm leading-6 text-zinc-700">
-            <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-700" />
-            <span>{detail}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="flex flex-wrap gap-2">
-        {skills.map((skill) => (
-          <Chip key={skill} className="rounded-md" size="sm" variant="secondary">
-            <Chip.Label>{skill}</Chip.Label>
-          </Chip>
-        ))}
-      </div>
-    </div>
-  );
-};
+        </li>
+      ))}
+    </ol>
+  </Section>
+);
 
-export default function PortfolioShowcase() {
-  const highlightedProjects = featuredWork.filter((item) =>
-    highlightedProjectTitles.includes(item.title)
-  );
-  const otherProjects = featuredWork.filter(
-    (item) => !highlightedProjectTitles.includes(item.title)
-  );
+const Certifications = () => (
+  <Section
+    href={pageAnchors.certifications}
+    index="03"
+    label="Certifications"
+    title={
+      <>
+        {/* Sized in em so the logo tracks the heading's cap height at every breakpoint. */}
+        <MicrosoftBrandIcon className="mr-[0.25em] inline-block size-[0.72em] align-[-0.04em]" />
+        Microsoft-certified in Azure AI and agentic systems.
+      </>
+    }
+  >
+    <ul className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      {certificates.map((cert) => (
+        <li key={cert.code}>
+          <a
+            href={cert.pdf}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block border border-border p-1.5 transition-colors hover:border-foreground"
+          >
+            <Image
+              src={cert.image}
+              alt={`Microsoft Certified: ${cert.title} certificate (opens PDF)`}
+              width={1200}
+              height={678}
+              sizes="(min-width: 1024px) 290px, (min-width: 640px) 45vw, 100vw"
+              className="h-auto w-full"
+            />
+          </a>
+          <p className={`label mt-4 ${cert.level === "Expert" ? "text-accent" : ""}`}>
+            {cert.code} · {cert.level}
+          </p>
+          <h3 className="mt-1.5 font-serif text-xl leading-snug">{cert.title}</h3>
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+            <ExternalLink href={cert.pdf}>View PDF</ExternalLink>
+            {cert.verifyUrl && <ExternalLink href={cert.verifyUrl}>Verify</ExternalLink>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </Section>
+);
 
-  return (
-    <div id="top" className="min-h-screen overflow-hidden bg-[var(--background)] text-zinc-950">
-      <section className="relative isolate border-b border-zinc-950/10">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[url('/images/hero-sec/banner-bg-img.png')] bg-cover bg-center opacity-75"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(247,249,244,0.2)_0%,#f7f9f4_46%,#f7f9f4_100%)]"
-        />
-        <div className="site-container relative z-10 py-20 sm:py-24 lg:py-28">
-          <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="max-w-4xl animate-fade-up">
-              <div className="flex flex-wrap items-center gap-3">
-                <Chip className="max-w-full rounded-md" color="success" variant="soft">
-                  <Sparkles className="size-3.5" />
-                  <Chip.Label className="truncate">Open to AI-integrated work</Chip.Label>
-                </Chip>
-                <span className="basis-full font-mono text-xs uppercase tracking-[0.2em] text-zinc-600 sm:basis-auto">
-                  FPT University - Vietnam
+const Research = () => (
+  <Section href={pageAnchors.research} index="04" label="Research" title="Computer vision, peer-reviewed.">
+    <ol className="space-y-12">
+      {researchPapers.map((paper, i) => (
+        <li key={paper.title} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-2 sm:grid-cols-[3.5rem_minmax(0,1fr)]">
+          <span className="font-mono text-lg text-accent">[{i + 1}]</span>
+          <article>
+            <p className="text-sm text-muted-foreground">
+              {paper.authors.map((author, j) => (
+                <span key={author}>
+                  {j > 0 && ", "}
+                  {author === selfAuthorName ? (
+                    <strong className="font-semibold text-foreground underline decoration-accent decoration-2 underline-offset-4">
+                      {author}
+                    </strong>
+                  ) : (
+                    author
+                  )}
                 </span>
-              </div>
-              <h1 className="mt-8 max-w-full break-words text-[2.15rem] font-semibold leading-[0.98] tracking-normal text-zinc-950 sm:max-w-4xl sm:text-6xl lg:text-7xl">
-                {profile.name}
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-emerald-900 sm:text-2xl">
-                {profile.role} focused on full-stack web, computer vision, and applied AI systems.
-              </p>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600 sm:text-lg">
-                {profile.summary}
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <ContactButton />
-                <Button
-                  className="rounded-md border-zinc-950/15 bg-white px-5 text-zinc-950 hover:bg-zinc-100"
-                  size="lg"
-                  variant="outline"
-                  onPress={() => {
-                    window.location.href = portfolioLinks.cv;
-                  }}
-                >
-                  <Download className="size-4" />
-                  Download CV
-                </Button>
-                <Button
-                  className="rounded-md px-5 text-zinc-800"
-                  size="lg"
-                  variant="tertiary"
-                  onPress={() => openExternal(profile.github)}
-                >
-                  <Github className="size-4" />
-                  GitHub
-                </Button>
-                <Button
-                  className="rounded-md px-5 text-zinc-800"
-                  size="lg"
-                  variant="tertiary"
-                  onPress={() => openExternal(profile.facebook)}
-                >
-                  <Facebook className="size-4" />
-                  Facebook
-                </Button>
-              </div>
-              <div className="mt-10 grid gap-3 sm:grid-cols-3">
-                {heroMetrics.map((metric) => (
-                  <Card
-                    key={metric.label}
-                    className="rounded-lg border border-zinc-950/10 bg-white/80 p-4 backdrop-blur"
-                    variant="transparent"
-                  >
-                    <Card.Title className="font-mono text-3xl font-semibold text-zinc-950">
-                      {metric.value}
-                    </Card.Title>
-                    <Card.Description className="mt-2 text-sm font-semibold text-zinc-800">
-                      {metric.label}
-                    </Card.Description>
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">{metric.detail}</p>
-                  </Card>
-                ))}
-              </div>
+              ))}
+            </p>
+            <h3 className="mt-2 font-serif text-2xl italic leading-snug">{paper.title}</h3>
+            <p className="mt-2 text-sm">
+              {paper.venue}, {paper.year}.{" "}
+              <span className="label ml-1 border border-accent px-2 py-0.5 text-accent">{paper.status}</span>
+            </p>
+            <ul className="mt-4 space-y-1.5 text-[15px] leading-7">
+              {paper.contributions.map((item) => (
+                <li key={item} className="grid grid-cols-[1.25rem_minmax(0,1fr)]">
+                  <span className="text-accent" aria-hidden>
+                    –
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+              <Tags items={paper.tags} />
+              <ExternalLink href={paper.href}>Code</ExternalLink>
             </div>
+          </article>
+        </li>
+      ))}
+    </ol>
+  </Section>
+);
 
-            <div className="relative animate-fade-up [animation-delay:120ms]">
-              <Card className="overflow-hidden rounded-lg border border-zinc-950/10 bg-white p-0 shadow-[0_30px_90px_rgba(20,28,24,0.18)]">
-                <div className="relative aspect-[4/5] min-h-[460px] bg-zinc-100">
-                  <Image
-                    priority
-                    src="/images/hero-sec/user-img.png"
-                    alt={profile.name}
-                    fill
-                    sizes="(min-width: 1024px) 420px, 100vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="absolute inset-x-4 bottom-4 rounded-md border border-white/35 bg-zinc-950/80 p-4 text-white backdrop-blur-md">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-mono text-xs uppercase tracking-[0.18em] text-emerald-200">
-                        Current signal
-                      </p>
-                      <p className="mt-1 text-sm font-medium">
-                        Researcher building production-ready AI interfaces.
-                      </p>
-                    </div>
-                    <Avatar className="size-12 border border-white/30">
-                      <Avatar.Image src="/images/hero-sec/user-img.png" alt={profile.name} />
-                      <Avatar.Fallback>{profile.initials}</Avatar.Fallback>
-                    </Avatar>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="about" className="section-band bg-white/72">
-        <div className="site-container">
-          <SectionHeading
-            kicker="About"
-            title="A software engineer learning where product engineering and AI research meet."
-            description="The portfolio is built around what matters most in the CV: research acceptance, full-stack delivery, practical AI integration, and a clear learning path through FPTU and Microsoft AI coursework."
-          />
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
-            {focusCards.map((card, index) => {
-              const icons = [FlaskConical, Layers3, Code2];
-              const Icon = icons[index];
-              return (
-                <Card
-                  key={card.title}
-                  className="rounded-lg border border-zinc-950/10 bg-[#fbfcf7] p-5"
-                  variant="default"
-                >
-                  <div className="flex size-11 items-center justify-center rounded-md bg-emerald-900 text-white">
-                    <Icon className="size-5" />
-                  </div>
-                  <Card.Header className="mt-4 p-0">
-                    <Card.Title className="text-lg font-semibold text-zinc-950">
-                      {card.title}
-                    </Card.Title>
-                    <Card.Description className="text-sm leading-6 text-zinc-600">
-                      {card.description}
-                    </Card.Description>
-                  </Card.Header>
-                </Card>
-              );
-            })}
-          </div>
-          <div className="mt-12 grid gap-4 lg:grid-cols-4">
-            {skills.map((group, index) => {
-              const icons = [Code2, Layers3, Database, FlaskConical];
-              const Icon = icons[index];
-              return (
-                <div key={group.title} className="rounded-lg border border-zinc-950/10 bg-white p-5">
-                  <div className="flex items-center gap-3">
-                    <Icon className="size-5 text-emerald-800" />
-                    <h3 className="font-semibold text-zinc-950">{group.title}</h3>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {group.items.map((item) => (
-                      <Chip key={item} className="rounded-md" size="sm" variant="soft">
-                        <Chip.Label>{item}</Chip.Label>
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="work" className="section-band relative isolate overflow-hidden bg-[#101712] text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:44px_44px]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-[linear-gradient(180deg,rgba(216,162,58,0.16)_0%,rgba(16,23,18,0)_100%)]"
-        />
-        <div className="site-container relative z-10">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-            <div>
-              <p className="section-kicker text-emerald-200">Selected work</p>
-              <h2 className="mt-4 max-w-4xl text-3xl font-semibold leading-tight tracking-normal text-white sm:text-4xl">
-                Project stories that show the interface, system layer, and measurable responsibility.
-              </h2>
-              <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:text-lg">
-                The two most representative builds get the full dossier treatment; the rest are one scan away below.
+const Education = () => (
+  <Section href={pageAnchors.education} index="05" label="Education" title="Degree and recognition.">
+    <div className="grid gap-12 md:grid-cols-2 md:gap-10">
+      <div>
+        <h3 className="label">Education</h3>
+        {education.map((item) => (
+          <div key={item.school} className="mt-4 border-t border-border pt-4">
+            <p className="font-serif text-xl">{item.school}</p>
+            <p className="mt-1 text-[15px]">{item.degree}</p>
+            <p className="label mt-3">{item.period}</p>
+            {item.details.map((detail) => (
+              <p key={detail} className="mt-1 text-sm text-muted-foreground">
+                {detail}
               </p>
-            </div>
-            <div className="border-l border-white/14 pl-5">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-amber-200">
-                Reading order
-              </p>
-              <div className="mt-5 grid gap-4">
-                {["Context", "Impact", "Stack", "Repository"].map((item, order) => (
-                  <div key={item} className="grid grid-cols-[32px_minmax(0,1fr)] items-center gap-3">
-                    <span className="flex size-8 items-center justify-center rounded-md border border-white/14 bg-white/8 font-mono text-xs font-bold text-white/78">
-                      {String(order + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm font-semibold text-zinc-200">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 grid gap-6">
-            {highlightedProjects.map((item, index) => (
-              <FeaturedCard key={item.title} item={item} index={index} />
             ))}
           </div>
+        ))}
+      </div>
 
-          <div className="mt-16">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-white/55">
-                More projects
-              </p>
-              <span className="text-sm text-white/45">
-                {otherProjects.length} additional {otherProjects.length === 1 ? "project" : "projects"}
-              </span>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {otherProjects.map((item) => (
-                <ProjectGridCard key={item.title} item={item} />
-              ))}
-            </div>
+      <div>
+        <h3 className="label">Recognition</h3>
+        {awards.map((award) => (
+          <div key={award.title} className="mt-4 border-t border-border pt-4">
+            <p className="font-serif text-xl">{award.title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{award.detail}</p>
+            <p className="label mt-3">{award.period}</p>
           </div>
-        </div>
-      </section>
-
-      <section id="experience" className="section-band bg-[#f7f9f4]">
-        <div className="site-container">
-          <SectionHeading
-            kicker="Experience"
-            title="A focused timeline across lab research, product engineering, and enterprise software training."
-            description="Each role shows the practical surface area behind the CV: what problem space I worked in, what responsibilities I owned, and which technologies were involved."
-          />
-          <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)]">
-            <div className="rounded-lg border border-zinc-950/10 bg-white p-6">
-              <BriefcaseBusiness className="size-8 text-emerald-800" />
-              <h3 className="mt-5 text-2xl font-semibold text-zinc-950">
-                What this section proves
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-zinc-600">
-                I have experience moving between research, backend/database design, frontend implementation, and enterprise platform training.
-              </p>
-              <div className="mt-6 grid gap-3">
-                {["AI research execution", "Full-stack product ownership", "Enterprise platform foundation"].map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-md bg-[#f7f9f4] p-3">
-                    <BadgeCheck className="size-4 text-emerald-700" />
-                    <span className="text-sm font-medium text-zinc-800">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="rounded-lg border border-zinc-950/10 bg-white p-6">
-              {experience.map((item) => (
-                <TimelineItem key={`${item.role}-${item.period}`} {...item} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="accepted-papers" className="section-band bg-white">
-        <div className="site-container">
-          <SectionHeading
-            kicker="Accepted papers"
-            title="Research work with accepted venues, implementation links, and concrete contributions."
-            description="This section is separated from experience so each paper can show the research topic, acceptance metadata, authorship, contribution scope, and technology stack."
-          />
-          <div className="mt-12 grid gap-5 lg:grid-cols-2">
-            {researchPapers.map((paper, index) => (
-              <Card
-                key={paper.title}
-                className="rounded-lg border border-zinc-950/10 bg-[#fbfcf7] p-6"
-                variant="default"
-              >
-                <Card.Header className="p-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Chip className="rounded-md" color="success" size="sm" variant="soft">
-                      <BookOpen className="size-3.5" />
-                      <Chip.Label>Paper {String(index + 1).padStart(2, "0")}</Chip.Label>
-                    </Chip>
-                    <Chip className="rounded-md" color="accent" size="sm" variant="soft">
-                      <CalendarDays className="size-3.5" />
-                      <Chip.Label>Accepted {paper.accepted}</Chip.Label>
-                    </Chip>
-                  </div>
-                  <Card.Title className="mt-5 text-2xl font-semibold leading-tight text-zinc-950">
-                    {paper.title}
-                  </Card.Title>
-                  <Card.Description className="text-sm leading-6 text-zinc-600">
-                    {paper.conference}
-                  </Card.Description>
-                </Card.Header>
-                <Card.Content className="mt-5 grid gap-5 p-0">
-                  <p className="text-sm leading-6 text-zinc-700">{paper.description}</p>
-                  <div className="grid gap-4 rounded-md border border-zinc-950/10 bg-white p-4">
-                    <div>
-                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">
-                        Role
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-700">{paper.role}</p>
-                    </div>
-                    <div>
-                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">
-                        Authors
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-700">{paper.authors}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-emerald-800">
-                      Contributions
-                    </p>
-                    <ul className="mt-3 grid gap-2">
-                      {paper.contributions.map((contribution) => (
-                        <li key={contribution} className="flex gap-3 text-sm leading-6 text-zinc-700">
-                          <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-700" />
-                          <span>{contribution}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {paper.tags.map((tag) => (
-                      <Chip key={tag} className="rounded-md" size="sm" variant="secondary">
-                        <Chip.Label>{tag}</Chip.Label>
-                      </Chip>
-                    ))}
-                  </div>
-                </Card.Content>
-                <Card.Footer className="mt-6 border-t border-zinc-950/10 p-0 pt-4">
-                  <HeroLink
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 hover:text-zinc-950"
-                    href={paper.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    View repository
-                    <ArrowUpRight className="size-4" />
-                  </HeroLink>
-                </Card.Footer>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="credentials" className="section-band bg-white">
-        <div className="site-container">
-          <SectionHeading
-            kicker="Credentials"
-            title="Education, certificates, and recognition in one compact view."
-            description="This section keeps the proof points scannable for recruiters: FPTU foundation, recent AI administration coursework, and academic awards."
-          />
-          <Tabs className="mt-10 w-full" defaultSelectedKey="education" variant="secondary">
-            <Tabs.ListContainer>
-              <Tabs.List
-                aria-label="Credentials"
-                className="w-full flex-wrap justify-start gap-2 rounded-lg border border-zinc-950/10 bg-[#f7f9f4] p-2 *:rounded-md *:px-4 *:py-2 *:text-sm *:font-semibold *:text-zinc-600 *:transition *:hover:text-zinc-950"
-              >
-                <Tabs.Tab className="relative z-0" id="education">
-                  <GraduationCap className="mr-2 inline size-4" />
-                  Education
-                  <Tabs.Indicator className="absolute inset-0 -z-10 rounded-md bg-white shadow-sm" />
-                </Tabs.Tab>
-                <Tabs.Tab className="relative z-0" id="certificates">
-                  <BadgeCheck className="mr-2 inline size-4" />
-                  Certificates
-                  <Tabs.Indicator className="absolute inset-0 -z-10 rounded-md bg-white shadow-sm" />
-                </Tabs.Tab>
-                <Tabs.Tab className="relative z-0" id="awards">
-                  <Trophy className="mr-2 inline size-4" />
-                  Awards
-                  <Tabs.Indicator className="absolute inset-0 -z-10 rounded-md bg-white shadow-sm" />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
-            <Tabs.Panel className="pt-6" id="education">
-              <div className="grid gap-4">
-                {education.map((item) => (
-                  <Card key={item.school} className="rounded-lg border border-zinc-950/10 bg-white p-5">
-                    <Card.Header className="p-0">
-                      <Card.Title className="text-xl font-semibold text-zinc-950">
-                        {item.degree}
-                      </Card.Title>
-                      <Card.Description className="text-sm text-zinc-600">
-                        {item.school} - {item.period}
-                      </Card.Description>
-                    </Card.Header>
-                    <Card.Content className="mt-4 p-0">
-                      <ul className="grid gap-2">
-                        {item.details.map((detail) => (
-                          <li key={detail} className="text-sm leading-6 text-zinc-700">
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </Card.Content>
-                  </Card>
-                ))}
-              </div>
-            </Tabs.Panel>
-            <Tabs.Panel className="pt-6" id="certificates">
-              <div className="grid gap-4 md:grid-cols-2">
-                {certificates.map((item) => (
-                  <Card key={item.title} className="rounded-lg border border-zinc-950/10 bg-white p-5">
-                    <Card.Header className="p-0">
-                      <Card.Title className="text-xl font-semibold text-zinc-950">
-                        {item.title}
-                      </Card.Title>
-                      <Card.Description className="text-sm text-zinc-600">
-                        {item.period}
-                      </Card.Description>
-                    </Card.Header>
-                    <Card.Content className="mt-4 p-0">
-                      <ul className="grid gap-2">
-                        {item.details.map((detail) => (
-                          <li key={detail} className="text-sm leading-6 text-zinc-700">
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </Card.Content>
-                  </Card>
-                ))}
-              </div>
-            </Tabs.Panel>
-            <Tabs.Panel className="pt-6" id="awards">
-              <div className="grid gap-4 md:grid-cols-2">
-                {awards.map((item, index) => {
-                  const Icon = index === 0 ? Medal : Award;
-                  return (
-                    <Card
-                      key={item.title}
-                      className="rounded-lg border border-zinc-950/10 bg-[#fbfcf7] p-5"
-                    >
-                      <Icon className="size-8 text-amber-700" />
-                      <Card.Header className="mt-4 p-0">
-                        <Card.Title className="text-xl font-semibold text-zinc-950">
-                          {item.title}
-                        </Card.Title>
-                        <Card.Description className="text-sm text-zinc-600">
-                          {item.period}
-                        </Card.Description>
-                      </Card.Header>
-                      <Card.Content className="mt-4 p-0">
-                        <ul className="grid gap-2">
-                          {item.details.map((detail) => (
-                            <li key={detail} className="text-sm leading-6 text-zinc-700">
-                              {detail}
-                            </li>
-                          ))}
-                        </ul>
-                      </Card.Content>
-                    </Card>
-                  );
-                })}
-              </div>
-            </Tabs.Panel>
-          </Tabs>
-
-          <Separator className="my-12" />
-
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
-            <div>
-              <p className="section-kicker">Side project</p>
-              <h3 className="mt-3 text-2xl font-semibold text-zinc-950">
-                Early engineering practice with C and SDL.
-              </h3>
-            </div>
-            <div className="grid gap-4">
-              {sideProjects.map((project) => (
-                <Card
-                  key={project.title}
-                  className="rounded-lg border border-zinc-950/10 bg-[#f7f9f4] p-5"
-                  variant="default"
-                >
-                  <Card.Header className="p-0">
-                    <Card.Title className="text-xl font-semibold text-zinc-950">
-                      {project.title}
-                    </Card.Title>
-                    <Card.Description className="text-sm text-zinc-600">
-                      {project.period}
-                    </Card.Description>
-                  </Card.Header>
-                  <Card.Content className="mt-4 p-0">
-                    <p className="text-sm leading-6 text-zinc-700">{project.description}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {project.tags.map((tag) => (
-                        <Chip key={tag} className="rounded-md" size="sm" variant="secondary">
-                          <Chip.Label>{tag}</Chip.Label>
-                        </Chip>
-                      ))}
-                    </div>
-                  </Card.Content>
-                  <Card.Footer className="mt-5 border-t border-zinc-950/10 p-0 pt-4">
-                    <HeroLink
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 hover:text-zinc-950"
-                      href={project.href}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      View repository
-                      <ArrowUpRight className="size-4" />
-                    </HeroLink>
-                  </Card.Footer>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-zinc-950/10 bg-[#eaf1ea] py-14">
-        <div className="site-container">
-          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
-            <div>
-              <p className="section-kicker">Next collaboration</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-zinc-950 sm:text-4xl">
-                Looking for a junior AI engineer who can still ship the product layer?
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-                I am ready for full-stack web projects, AI-integrated products, and research-heavy software work where careful implementation matters.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <ContactButton />
-              <Button
-                className="rounded-md border-zinc-950/15 bg-white text-zinc-950"
-                variant="outline"
-                onPress={() => openExternal(profile.linkedin)}
-              >
-                <Linkedin className="size-4" />
-                LinkedIn
-              </Button>
-              <Button
-                className="rounded-md border-zinc-950/15 bg-white text-zinc-950"
-                variant="outline"
-                onPress={() => openExternal(profile.facebook)}
-              >
-                <Facebook className="size-4" />
-                Facebook
-              </Button>
-            </div>
-          </div>
-          <div className="mt-10 flex flex-col gap-3 text-sm text-zinc-600 sm:flex-row sm:items-center">
-            <span className="inline-flex items-center gap-2">
-              <Mail className="size-4" />
-              {profile.email}
-            </span>
-            <span className="hidden h-4 w-px bg-zinc-950/20 sm:block" />
-            <span className="inline-flex items-center gap-2">
-              <Phone className="size-4" />
-              {profile.phone}
-            </span>
-            <span className="hidden h-4 w-px bg-zinc-950/20 sm:block" />
-            <span className="inline-flex items-center gap-2">
-              <ExternalLink className="size-4" />
-              {linkLabels.github}
-            </span>
-            <span className="hidden h-4 w-px bg-zinc-950/20 sm:block" />
-            <span className="inline-flex items-center gap-2">
-              <Facebook className="size-4" />
-              {linkLabels.facebook}
-            </span>
-          </div>
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
-  );
-}
+  </Section>
+);
+
+const Contact = () => (
+  <Section href={pageAnchors.contact} index="06" label="Contact" title="Have an AI idea that needs to ship? Let's talk.">
+    <a
+      href={portfolioLinks.email}
+      className="ink-link font-serif text-[clamp(1.25rem,5vw,3rem)] leading-tight [overflow-wrap:anywhere] hover:text-accent"
+    >
+      {profile.email}
+    </a>
+    <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
+      <ExternalLink href={profile.linkedin} icon={<LinkedInBrandIcon className="size-4" />}>
+        LinkedIn
+      </ExternalLink>
+      <ExternalLink href={profile.github} icon={<GitHubBrandIcon className="size-4" />}>
+        GitHub
+      </ExternalLink>
+      <ExternalLink href={portfolioLinks.cv} icon={<ReadCvBrandIcon className="size-4" />}>
+        CV
+      </ExternalLink>
+    </div>
+  </Section>
+);
+
+const PortfolioShowcase = () => (
+  <>
+    <OutlineNav />
+    <Hero />
+    <About />
+    <Experience />
+    <Certifications />
+    <Research />
+    <Education />
+    <Contact />
+  </>
+);
+
+export default PortfolioShowcase;

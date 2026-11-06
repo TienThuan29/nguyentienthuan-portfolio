@@ -58,7 +58,7 @@ const HeroSection = () => {
               <div className="flex flex-col gap-2 sm:gap-3 items-center text-center xs:items-start">
                 <h1>Nguyễn Tiến Thuận</h1>
                 <p className="text-violet-700 font-normal">
-                  Software Engineer · Full-stack web &amp; AI research
+                  Software Engineer | Full-stack web &amp; AI research
                 </p>
                 <div className="flex items-center gap-2">
                   <MapIcon className="size-5 text-primary" />

@@ -6,6 +6,7 @@
 
 @theme inline {
   --font-sans: var(--font-be-vietnam);
+  --font-serif: var(--font-newsreader);
   --font-mono: var(--font-jetbrains);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -26,22 +27,23 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Editorial palette: white page, ink, one vermilion accent. */
 :root {
-  --radius: 0.5rem;
-  --background: #f7f9f4;
-  --foreground: #121815;
+  --radius: 0.25rem;
+  --background: #ffffff;
+  --foreground: #16181c;
   --card: #ffffff;
-  --card-foreground: #121815;
-  --primary: #121815;
+  --card-foreground: #16181c;
+  --primary: #16181c;
   --primary-foreground: #ffffff;
-  --secondary: #55615a;
-  --secondary-foreground: #121815;
-  --muted: #eef2eb;
-  --muted-foreground: #66726a;
-  --accent: #d8a23a;
-  --accent-foreground: #121815;
-  --border: rgba(18, 24, 21, 0.12);
-  --ring: rgba(4, 120, 87, 0.32);
+  --secondary: #4f535a;
+  --secondary-foreground: #16181c;
+  --muted: #f3f4f6;
+  --muted-foreground: #5b6069;
+  --accent: #b13d1a;
+  --accent-foreground: #ffffff;
+  --border: rgba(22, 24, 28, 0.14);
+  --ring: rgba(177, 61, 26, 0.45);
 }
 
 * {
@@ -56,24 +58,21 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    linear-gradient(90deg, rgba(18, 24, 21, 0.045) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(18, 24, 21, 0.045) 1px, transparent 1px),
-    var(--background);
-  background-size: 48px 48px;
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
-  text-rendering: geometricPrecision;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #1f6f5b;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 
-a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 img {
@@ -82,15 +81,44 @@ img {
 
 @layer utilities {
   .site-container {
-    @apply mx-auto w-full max-w-7xl px-5 sm:px-7 lg:px-10;
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10;
   }
 
   .section-band {
-    @apply py-16 sm:py-20 lg:py-24;
+    @apply py-12 sm:py-16;
   }
 
-  .section-kicker {
-    @apply font-mono text-sm font-bold uppercase tracking-[0.18em] text-emerald-800 sm:text-base;
+  .label {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground;
+  }
+
+  /* Underline that draws in from the left on hover. */
+  .ink-link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 320ms cubic-bezier(0.2, 0.8, 0.2, 1), color 200ms;
+  }
+
+  .ink-link:hover {
+    background-size: 100% 1px;
+  }
+
+  /* Dissolves a full-bleed backdrop into the white page along its bottom edge (sides already touch the viewport). */
+  .ink-fade-down {
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  }
+
+  .drop-cap::first-letter {
+    float: left;
+    /* Sized so the float stays under two body lines (leading 2rem) — a clean two-line drop cap. */
+    margin: 0.05em 0.1em 0 0;
+    font-family: var(--font-newsreader), serif;
+    font-size: 3.9em;
+    line-height: 0.78;
+    color: var(--accent);
   }
 
   .animate-fade-up {
