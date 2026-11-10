@@ -80,6 +80,19 @@ const Section = ({
   </section>
 );
 
+const Bullets = ({ items, className }: { items: readonly string[]; className: string }) => (
+  <ul className={`${className} text-[15px] leading-7`}>
+    {items.map((item) => (
+      <li key={item} className="grid grid-cols-[1.25rem_minmax(0,1fr)]">
+        <span className="text-accent" aria-hidden>
+          –
+        </span>
+        {item}
+      </li>
+    ))}
+  </ul>
+);
+
 /* Tag label → logo in public/icons/tech/ (Dashboard Icons; spring.svg via its Simple Icons set).
    Concept tags have no brand logo, so they get a monochrome lucide glyph (conceptIcons) in the label's ink instead. */
 const tagIcons: Record<string, string> = {
@@ -92,6 +105,8 @@ const tagIcons: Record<string, string> = {
   Java: "java",
   PyTorch: "pytorch",
   "Spring Framework": "spring",
+  "Azure AI Foundry": "azure",
+  "Microsoft Agent Framework": "microsoft",
   Salesforce: "salesforce",
   "Lightning Web Components": "salesforce",
   Apex: "salesforce",
@@ -227,7 +242,7 @@ const Hero = () => {
         </div>
   
         <dl
-          className="mt-16 grid border-y border-border sm:grid-cols-3 animate-fade-up"
+          className="mt-16 grid border-y border-border sm:grid-cols-2 animate-fade-up"
           style={fadeDelay(280)}
         >
           {heroMetrics.map((metric) => (
@@ -248,7 +263,13 @@ const Hero = () => {
 
 const About = () => (
   <Section href={pageAnchors.about} index="01" label="About" title="Engineer first, explainer by training.">
-    <p className="drop-cap max-w-2xl text-lg leading-8">{profile.summary}</p>
+    <div className="max-w-2xl space-y-5 text-lg leading-8">
+      {profile.about.map((paragraph, i) => (
+        <p key={paragraph} className={i === 0 ? "drop-cap" : undefined}>
+          {paragraph}
+        </p>
+      ))}
+    </div>
 
     <h3 className="label mt-16">Toolkit</h3>
     <dl className="mt-4 border-b border-border">
@@ -291,16 +312,14 @@ const Experience = () => (
               {job.role} <span className="text-muted-foreground">— {job.org}</span>
             </h3>
             <p className="mt-2 font-serif text-lg italic text-muted-foreground">{job.summary}</p>
-            <ul className="mt-4 space-y-2 text-[15px] leading-7">
-              {job.details.map((detail) => (
-                <li key={detail} className="grid grid-cols-[1.25rem_minmax(0,1fr)]">
-                  <span className="text-accent" aria-hidden>
-                    –
-                  </span>
-                  {detail}
-                </li>
-              ))}
-            </ul>
+            <Bullets items={job.details} className="mt-4 space-y-2" />
+            {job.projects?.map((project) => (
+              <div key={project.name} className="mt-6 border-l border-border pl-5">
+                <h4 className="font-serif text-xl leading-tight">{project.name}</h4>
+                <p className="mt-1 text-sm text-muted-foreground">{project.description}</p>
+                <Bullets items={project.details} className="mt-3 space-y-2" />
+              </div>
+            ))}
             <div className="mt-5">
               <Tags items={job.skills} />
             </div>
@@ -381,17 +400,9 @@ const Research = () => (
             <p className="mt-2 text-sm">
               {paper.venue}, {paper.year}.{" "}
               <span className="label ml-1 border border-accent px-2 py-0.5 text-accent">{paper.status}</span>
+              {paper.accepted && <span className="label ml-3">Accepted {paper.accepted}</span>}
             </p>
-            <ul className="mt-4 space-y-1.5 text-[15px] leading-7">
-              {paper.contributions.map((item) => (
-                <li key={item} className="grid grid-cols-[1.25rem_minmax(0,1fr)]">
-                  <span className="text-accent" aria-hidden>
-                    –
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <Bullets items={paper.contributions} className="mt-4 space-y-1.5" />
             <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
               <Tags items={paper.tags} />
               <ExternalLink href={paper.href}>Code</ExternalLink>

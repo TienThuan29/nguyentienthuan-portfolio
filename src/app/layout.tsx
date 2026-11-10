@@ -24,11 +24,11 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Nguyễn Tiến Thuận Portfolio",
   description:
-    "AI Engineer at SoftwareOne Vietnam building AI agents, LLM apps, and full-stack products. Two computer vision papers, three Microsoft certifications.",
+    "AI Engineer & Presales at SoftwareOne Vietnam building AI agents, Azure AI platforms, and full-stack products. Two computer vision papers, three Microsoft certifications.",
   openGraph: {
-    title: "Nguyễn Tiến Thuận | AI Engineer",
+    title: "Nguyễn Tiến Thuận | AI Engineer & Presales",
     description:
-      "AI agents, LLM apps, and full-stack AI products — plus computer vision research and university teaching.",
+      "AI agents, enterprise AI platforms, and full-stack AI products — plus computer vision research and university teaching.",
     type: "website",
   },
 };
